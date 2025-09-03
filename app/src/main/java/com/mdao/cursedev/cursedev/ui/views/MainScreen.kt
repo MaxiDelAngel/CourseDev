@@ -40,6 +40,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -81,6 +83,12 @@ fun MainScreen(navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
+                        .clip(
+                            RoundedCornerShape(
+                                bottomStart = 32.dp,
+                                bottomEnd = 32.dp
+                            )
+                        )
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
@@ -241,6 +249,12 @@ fun PreviewMainScreen(){
 
 @Composable
 fun CardCurse(){
+    var nombre by remember { mutableStateOf("Curso") }
+    var imagen by remember { mutableIntStateOf(R.drawable.ic_launcher_background) }
+    var status by remember { mutableStateOf("Nuevo") }
+    var statusOn by remember { mutableStateOf(false) }
+    var conceptos by remember { mutableIntStateOf(0) }
+    var progreso by remember { mutableFloatStateOf(0.0f) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -292,7 +306,7 @@ fun CardCurse(){
                             .padding(3.dp)
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.js),
+                            painter = painterResource(id = imagen),
                             contentDescription = "Imagen del curso",
                             modifier = Modifier
                                 .fillMaxSize()
@@ -310,26 +324,46 @@ fun CardCurse(){
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "JavaScript",
+                                text = nombre,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
                                 color = Color(0xFF2D3748)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .background(
-                                        Color(0xFF48BB78),
-                                        RoundedCornerShape(12.dp)
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = "Popular",
-                                    fontSize = 10.sp,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Medium
-                                )
+                            if (statusOn){
+                                if (status == "Popular"){
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                Color(0xFFFFEB3B),
+                                                RoundedCornerShape(12.dp)
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = status,
+                                            fontSize = 10.sp,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                Color(0xFF48BB78),
+                                                RoundedCornerShape(12.dp)
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = status,
+                                            fontSize = 10.sp,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
                             }
                         }
 
@@ -346,27 +380,7 @@ fun CardCurse(){
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "13 ejemplos",
-                                fontSize = 14.sp,
-                                color = Color(0xFF718096),
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = null,
-                                tint = Color(0xFF667eea),
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "13 códigos",
+                                text = "$conceptos conceptos",
                                 fontSize = 14.sp,
                                 color = Color(0xFF718096),
                                 fontWeight = FontWeight.Medium
@@ -379,7 +393,7 @@ fun CardCurse(){
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             LinearProgressIndicator(
-                                progress = 0.65f,
+                                progress = progreso,
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(6.dp)
@@ -389,7 +403,7 @@ fun CardCurse(){
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "65%",
+                                text = progreso.toInt().toString() + "%",
                                 fontSize = 12.sp,
                                 color = Color(0xFF667eea),
                                 fontWeight = FontWeight.Bold
