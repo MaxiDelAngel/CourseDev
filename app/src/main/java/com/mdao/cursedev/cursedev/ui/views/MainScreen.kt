@@ -120,13 +120,30 @@ fun MainScreen(navController: NavHostController) {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item {
-                        CardCurse()
-                        CardCurse()
-                        CardCurse()
-                        CardCurse()
-                        CardCurse()
-                        CardCurse()
-                        CardCurse()
+                        CardCurse(
+                            nombre = "Github",
+                            imagen = R.drawable.github,
+                            statusOn = true,
+                            status = "Popular",
+                            conceptos = 8,
+                            progreso = 0.2f
+                        )
+                        CardCurse(
+                            nombre = "Javascript",
+                            imagen = R.drawable.js,
+                            statusOn = true,
+                            status = "Nuevo",
+                            conceptos = 16,
+                            progreso = 0.9f
+                        )
+                        CardCurse(
+                            nombre = "Kotlin",
+                            imagen = R.drawable.kotlin_icon,
+                            statusOn = true,
+                            status = "Popular",
+                            conceptos = 12,
+                            progreso = 0.7f
+                        )
                     }
                 }
             }
@@ -248,13 +265,14 @@ fun PreviewMainScreen(){
 }
 
 @Composable
-fun CardCurse(){
-    var nombre by remember { mutableStateOf("Curso") }
-    var imagen by remember { mutableIntStateOf(R.drawable.ic_launcher_background) }
-    var status by remember { mutableStateOf("Nuevo") }
-    var statusOn by remember { mutableStateOf(false) }
-    var conceptos by remember { mutableIntStateOf(0) }
-    var progreso by remember { mutableFloatStateOf(0.0f) }
+fun CardCurse(
+    nombre: String = "Curso",
+    imagen: Int = R.drawable.ic_launcher_background,
+    status: String = "Nuevo",
+    statusOn: Boolean = false,
+    conceptos: Int = 0,
+    progreso: Float = 0.0f
+){
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -294,15 +312,6 @@ fun CardCurse(){
                     Box(
                         modifier = Modifier
                             .size(90.dp)
-                            .background(
-                                brush = Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color(0xFF667eea),
-                                        Color(0xFF764ba2)
-                                    )
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            )
                             .padding(3.dp)
                     ) {
                         Image(
@@ -403,7 +412,7 @@ fun CardCurse(){
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = progreso.toInt().toString() + "%",
+                                text = (progreso * 100).toInt().toString() + "%",
                                 fontSize = 12.sp,
                                 color = Color(0xFF667eea),
                                 fontWeight = FontWeight.Bold
