@@ -21,16 +21,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mdao.cursedev.R
+import com.mdao.cursedev.ui.theme.MainColor
+import com.mdao.cursedev.ui.theme.SecundColor
 
-@Preview (showBackground = true)
 @Composable
-fun CurseScreen() {
+fun CurseScreen(navigateToBack: () -> Boolean) {
     Column(
         modifier = Modifier.fillMaxSize()
     ){
@@ -38,11 +39,13 @@ fun CurseScreen() {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Icono flecha regresar",
-                tint = Black,
+                tint = MainColor,
                 modifier = Modifier
                     .padding(vertical = 24.dp)
                     .size(24.dp)
-                    .clickable { }
+                    .clickable {
+                        navigateToBack()
+                    }
             )
         }
         Column(
@@ -50,23 +53,30 @@ fun CurseScreen() {
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
-            CardScreen()
-            CardScreen()
             CardScreen()
         }
     }
 }
 
 @Composable
-fun CardScreen() {
+fun CardScreen(
+    title: String = "Titulo",
+    code: String = "print('Hola Mundo')",
+    content: String = "Contenido"
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(8.dp),
+                ambientColor = SecundColor,
+                spotColor = SecundColor
+            ),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         )
@@ -76,7 +86,7 @@ fun CardScreen() {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text("Titulo")
+            Text(title)
             Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
@@ -86,10 +96,10 @@ fun CardScreen() {
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ){
-                Text("git init -A", color = Color.White)
+                Text(code, color = Color.White)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Contenido")
+            Text(content)
         }
     }
 }

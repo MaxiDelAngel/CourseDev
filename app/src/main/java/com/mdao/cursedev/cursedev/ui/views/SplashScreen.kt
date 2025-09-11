@@ -50,7 +50,7 @@ fun Splash() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "CurseDev />",
+            text = "CourseDev />",
             color = Color.White,
             fontSize = 48.sp,
             fontWeight = FontWeight.Medium,
