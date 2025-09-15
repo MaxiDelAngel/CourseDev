@@ -1,5 +1,6 @@
 package com.mdao.cursedev.cursedev.ui.views
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -25,6 +27,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +38,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,13 +59,36 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.mdao.cursedev.R
+import com.mdao.cursedev.cursedev.repository.RetrofitClient
+import com.mdao.cursedev.cursedev.ui.models.DataAllCourses
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController, navigateToCourse: () -> Unit) {
+fun MainScreen(navController: NavHostController, navigateToCourse: (Int) -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    var AllCourses by remember { mutableStateOf<List<DataAllCourses>>(emptyList()) }
     val searchHistory = remember { mutableListOf("Android", "Compose", "Kotlin") }
+
+    LaunchedEffect(Unit) {
+        try {
+            val response = RetrofitClient.webService.getAllCourses()
+            if (response.isSuccessful) {
+                AllCourses = response.body()?.data ?: emptyList()
+                Log.d("Información de cursos", "Cursos: ${response.body()?.data}")
+            } else {
+                Log.e("Error al obtener Información de cursos", "Error: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            Log.e("API_CALL_EXCEPTION", "Error: ${e.message}")
+        } finally {
+            isLoading = false
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -74,12 +102,6 @@ fun MainScreen(navController: NavHostController, navigateToCourse: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
-                        .clip(
-                            RoundedCornerShape(
-                                bottomStart = 32.dp,
-                                bottomEnd = 32.dp
-                            )
-                        )
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
@@ -104,38 +126,42 @@ fun MainScreen(navController: NavHostController, navigateToCourse: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item {
-                        CardCourse(
-                            nombre = "Github",
-                            imagen = R.drawable.github,
-                            bandera = true,
-                            status = "Popular",
-                            conceptos = 8,
-                            progreso = 0.2f,
-                            navigateToCourse = { navigateToCourse() }
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = Color(0xFF7C3AED)
                         )
-                        CardCourse(
-                            nombre = "Javascript",
-                            imagen = R.drawable.js,
-                            bandera = true,
-                            status = "Nuevo",
-                            conceptos = 16,
-                            navigateToCourse = { navigateToCourse() }
-                        )
-                        CardCourse(
-                            nombre = "Kotlin",
-                            imagen = R.drawable.kotlin_icon,
-                            bandera = true,
-                            status = "Popular",
-                            conceptos = 12,
-                            navigateToCourse = { navigateToCourse() }
-                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(AllCourses) { course ->
+                            val resourceName = course.imagen.substringAfterLast('.')
+                            val resourceId = context.resources.getIdentifier(
+                                resourceName,
+                                "drawable",
+                                context.packageName
+                            )
+                            CardCourse(
+                                courseId = course.course_id,
+                                nombre = course.course_name,
+                                imagen = if (resourceId != 0) resourceId else R.drawable.ic_launcher_foreground,
+                                bandera = course.course_bandera == 1,
+                                status = course.course_status,
+                                conceptos = course.course_conceptos,
+                                progreso = course.course_progreso,
+                                navigateToCourse = { selectedCourseId ->
+                                    navigateToCourse(selectedCourseId)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -250,20 +276,21 @@ fun MainScreen(navController: NavHostController, navigateToCourse: () -> Unit) {
 
 @Composable
 fun CardCourse(
+    courseId: Int,
     nombre: String = "Curso",
     imagen: Int = R.drawable.ic_launcher_background,
     status: String = "Nuevo",
     bandera: Boolean = false,
     conceptos: Int = 0,
     progreso: Float = 0.0f,
-    navigateToCourse: () -> Unit
+    navigateToCourse: (Int) -> Unit
 ){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable {
-                navigateToCourse()
+                navigateToCourse(courseId)
             },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),

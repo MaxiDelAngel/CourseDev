@@ -7,5 +7,5 @@ import com.mdao.cursedev.cursedev.ui.models.DataContentCourse
 data class GetContentCourse(
     @SerializedName("code") var code: String = "",
     @SerializedName("mensaje") var mensaje: String = "",
-    @SerializedName("data") var data: DataContentCourse? = null
+    @SerializedName("data") var data: List<DataContentCourse>? = null
 )
