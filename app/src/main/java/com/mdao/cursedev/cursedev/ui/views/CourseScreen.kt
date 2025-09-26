@@ -161,12 +161,6 @@ fun CourseScreen(navigateToBack: () -> Boolean, courseId: Int) {
                             code = course.content_code,
                             content = course.content_content,
                             stepNumber = index + 1,
-                            isCompleted = index <= currentStep,
-                            onMarkAsCompleted = {
-                                if (index == currentStep) {
-                                    currentStep = (currentStep + 1).coerceAtMost(InfoCourse.size - 1)
-                                }
-                            }
                         )
                     }
                 }
@@ -182,8 +176,6 @@ fun ModernCardScreen(
     code: String = "print('Hola Mundo')",
     content: String = "Contenido",
     stepNumber: Int = 1,
-    isCompleted: Boolean = false,
-    onMarkAsCompleted: () -> Unit = {}
 ) {
     val clipboardManager = LocalClipboardManager.current
 
@@ -216,13 +208,13 @@ fun ModernCardScreen(
                         modifier = Modifier
                             .size(32.dp)
                             .background(
-                                color = if (isCompleted) Color(0xFF22C55E) else MainColor,
+                                color = MainColor,
                                 shape = RoundedCornerShape(16.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = if (isCompleted) "✓" else stepNumber.toString(),
+                            text = stepNumber.toString(),
                             color = Color.White,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
@@ -237,21 +229,6 @@ fun ModernCardScreen(
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1E293B)
                     )
-                }
-
-                if (!isCompleted) {
-                    TextButton(
-                        onClick = onMarkAsCompleted,
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MainColor
-                        )
-                    ) {
-                        Text(
-                            text = "Completar",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
                 }
             }
 

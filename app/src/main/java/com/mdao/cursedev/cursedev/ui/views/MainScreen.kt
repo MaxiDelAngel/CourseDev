@@ -114,7 +114,7 @@ fun MainScreen(navController: NavHostController, navigateToCourse: (Int) -> Unit
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        "CurseDev />",
+                        "CourseDev />",
                         modifier = Modifier
                             .padding(42.dp)
                             .fillMaxWidth(),
@@ -408,28 +408,7 @@ fun CardCourse(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            LinearProgressIndicator(
-                                progress = progreso,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp)),
-                                color = Color(0xFF667eea),
-                                trackColor = Color(0xFFE2E8F0)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = (progreso * 100).toInt().toString() + "%",
-                                fontSize = 12.sp,
-                                color = Color(0xFF667eea),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
 
                     Icon(
